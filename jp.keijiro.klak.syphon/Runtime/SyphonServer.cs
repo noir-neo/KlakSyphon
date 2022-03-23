@@ -123,8 +123,7 @@ namespace Klak.Syphon
                     return;
                 }
 
-                // Request texture copy.
-                Graphics.CopyTexture(_sourceTexture, _serverTexture);
+                SendRenderTexture(_sourceTexture);
             }
 
             // Publish the new frame.
@@ -135,18 +134,22 @@ namespace Klak.Syphon
         {
             if (_serverTexture != null && _blitMaterial != null)
             {
-                // Capture the camera render.
-                var temp = RenderTexture.GetTemporary(
-                    _serverTexture.width, _serverTexture.height, 0,
-                    RenderTextureFormat.Default, RenderTextureReadWrite.Default
-                );
-                Graphics.Blit(source, temp, _blitMaterial, _alphaSupport ? 1 : 0);
-                Graphics.CopyTexture(temp, _serverTexture);
-                RenderTexture.ReleaseTemporary(temp);
+                SendRenderTexture(source);
             }
 
             // Dumb blit
             Graphics.Blit(source, dest);
+        }
+
+        void SendRenderTexture(RenderTexture source)
+        {
+            var temp = RenderTexture.GetTemporary(
+                    _serverTexture.width, _serverTexture.height, 0,
+                    RenderTextureFormat.Default, RenderTextureReadWrite.Default
+                );
+            Graphics.Blit(source, temp, _blitMaterial, _alphaSupport ? 1 : 0);
+            Graphics.CopyTexture(temp, _serverTexture);
+            RenderTexture.ReleaseTemporary(temp);
         }
 
         #endregion
